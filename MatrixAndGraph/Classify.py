@@ -4,7 +4,7 @@ import numpy as np
 
 class Classify:
     def __init__(self,rmatrix,level = 3):
-        self.__rmatrix = np.swapaxes(rmatrix,0,1)[:12]
+        self.__rmatrix = np.swapaxes(rmatrix,0,1)
         self.__classPair = []
         self.__level = level
     
@@ -32,6 +32,7 @@ class Classify:
     
     def getSingleNum(self,index,dataMatrix):
         _reslist = []
+        print self.__pairList
         for _group in self.__pairList:
             _res = 0
             _num = float(len(_group))

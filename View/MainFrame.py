@@ -4,12 +4,8 @@ import wx
 from GlobalData.MagicNum import MainFramMenuId, UserDB, DataMap
 from GlobalData import MagicNum
 from MatrixAndGraph import DataHandle, PolyGraph, Aggregation
-import AlterUserPositionDialog
-import AlterUserPasswordDialog
-import AlterUserPermissionDialog
-import AddQuotaDialog
-import LoginDialog
-import SelectQuotaDialog
+import AlterUserPositionDialog, AlterUserPasswordDialog, AlterUserPermissionDialog
+import AddQuotaDialog, LoginDialog, SelectQuotaDialog, SetAggregationDialog
 import MatrixTable
 
 
@@ -18,7 +14,7 @@ import wx.grid
 
 usermenu = {MainFramMenuId.USER_ALTERPOS:"修改信息",MainFramMenuId.USER_ALTERPSW:"修改密码",MainFramMenuId.USER_LOGOUT:"注销登录"}
 quotamenu = {MainFramMenuId.QUOTA_MANAGE:"管理",MainFramMenuId.QUOTA_ADD:"增加",MainFramMenuId.QUOTA_SEARCH:"查看"}
-evaluatemenu = {MainFramMenuId.EVALUATE_GETDATA:"数据输入",MainFramMenuId.EVALUATE_COMPUTE:"数据处理"}
+evaluatemenu = {MainFramMenuId.EVALUATE_GETDATA:"数据输入",MainFramMenuId.EvALUATE_AGGREGATION:"聚类设置",MainFramMenuId.EVALUATE_COMPUTE:"数据处理"}
 graphmenu = {MainFramMenuId.GRAYRE_TOTAL:"客户群价值",MainFramMenuId.GRAYRE_SEPARATE:"当前和未来",MainFramMenuId.WARD_AGGREGATION:"聚类图"}
 systemmenu = {MainFramMenuId.SYSTEM_AUDIT:"用户审核",MainFramMenuId.SYSTEM_PERMISSION:"权限管理",MainFramMenuId.SYSTEM_HELP:"使用帮助"}
 
@@ -39,6 +35,8 @@ class MainFrame(wx.Frame):
         self.__username = username
         self.__permission = permission
         self.__data = DataHandle.DataHandle()
+        self.__level = 3
+        self.__indexlist = []
         
         self.__vbox_top = wx.BoxSizer(wx.VERTICAL)
         self.__panel_top = wx.Panel(self)
@@ -158,7 +156,17 @@ class MainFrame(wx.Frame):
         wx.EVT_MENU(self,MainFramMenuId.GRAYRE_SEPARATE,self.menuSeparateGrapyCmd)
         wx.EVT_MENU(self,MainFramMenuId.GRAYRE_TOTAL,self.menuTotalGrapyCmd)
         wx.EVT_MENU(self,MainFramMenuId.WARD_AGGREGATION,self.menuWardGarphCmd)
+        wx.EVT_MENU(self,MainFramMenuId.EvALUATE_AGGREGATION,self.menuSetAggregationCmd)
 
+    def menuSetAggregationCmd(self,event):
+        try:
+            s = SetAggregationDialog.SetAggregationDialog("聚类设置",self.__customerlist)
+            s.Run()
+            self.__level = s.level
+            self.__indexlist = s.indexList
+        except:
+            wx.MessageBox("请先获取数据","错误",wx.ICON_ERROR|wx.YES_DEFAULT)
+   
     def menuWardGarphCmd(self,event):
         a = Aggregation.Aggregation(self.__data.GetData(MagicNum.DataMap.SIX_LINKRESULT),
                                     self.__data.GetData(MagicNum.DataMap.ZERO_ROWLABEL))
@@ -216,7 +224,7 @@ class MainFrame(wx.Frame):
                             style=wx.OPEN
                             )
         if dlg.ShowModal() == wx.ID_OK:
-            self.__data.GetFileData(dlg.GetPath())
+            self.__customerlist = self.__data.GetFileData(dlg.GetPath())
         dlg.Destroy()
     
     def menuComputeCmd(self,event):
@@ -238,7 +246,13 @@ class MainFrame(wx.Frame):
             _index += 1
             self.__collabel.append(single[0])
             self.__optlist.append(single[2])
-        self.__data.ComputeResult(self.__optlist,_curlist,_futlist)
+        try:
+            self.__indexlist.sort()
+            print self.__indexlist
+            self.__data.ComputeResult(self.__optlist,_curlist,_futlist,self.__level,self.__indexlist)
+        except Exception,e:
+            print e 
+            wx.MessageBox("请先获取数据","错误",wx.ICON_ERROR|wx.YES_DEFAULT)
     
     def menuTotalGrapyCmd(self,event):
         try:

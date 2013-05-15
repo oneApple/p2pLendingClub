@@ -21,9 +21,9 @@ class DataHandle:
                 except ValueError, e:
                     print self.__originData[col - 1][row],e
         del self.__originData[len(self.__originData) - 1]
-        return self.__originData
+        return self.__rowlabel
     
-    def ComputeResult(self,typelist,curlist,futlist):
+    def ComputeResult(self,typelist,curlist,futlist,level,userlist):
         s = StandardProcess.StandardProcess(self.__originData,typelist)
         self.__standardData = s.ComputeResult()
         
@@ -39,8 +39,19 @@ class DataHandle:
         c = CFGrayRelationWeight.CFGrayRelationWeight(self.__GrayRelationData,self.__quotaData[3],curlist,futlist)
         self.__grayRelationWeightData += c.ComputeResult()
         
-        c = Classify.Classify(self.__GrayRelationData)
-        _result = c.ComputeResult(self.__rowlabel, self.__GrayRelationData)
+        
+        _classfiydata = []
+        _computedata = []
+        _userlabe = []
+        
+        import numpy as np
+        for _index in userlist:
+            _classfiydata.append(np.swapaxes(self.__GrayRelationData,0,1)[_index])
+            _computedata.append(np.swapaxes(self.__grayRelationWeightData,0,1)[_index])
+            _userlabe.append(self.__rowlabel[_index])
+        
+        c = Classify.Classify(np.swapaxes(_classfiydata,0,1),level)
+        _result = c.ComputeResult(_userlabe,np.swapaxes(_computedata,0,1))
         self.__aggregationData = _result[0]
         self.__linkresult = _result[1]
         
@@ -75,9 +86,7 @@ if __name__=='__main__':
 
         d =  DataHandle()
         d.GetFileData("../data.plc")  
-        d.ComputeResult(typelist,[0,1,2],[3,4,5,6,7])
-        for col in d.GetData(DataMap.SIX_LINKRESULT):
-            print col
+        d.ComputeResult(typelist,[0,1,2],[3,4,5,6,7],3,[0,1,2,3,4,5,6,7,8,9,10,11])
         import Aggregation
-        a = Aggregation.Aggregation(col,[x for x in range(1,13)])
+        a = Aggregation.Aggregation(d.GetData(DataMap.SIX_LINKRESULT),[x for x in range(1,13)])
         a.Draw("title", "xlabel", "ylabel")
