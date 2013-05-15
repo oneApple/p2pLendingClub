@@ -25,7 +25,8 @@ rootquota = []
 adminquota = [MainFramMenuId.SYSTEM_PERMISSION]
 normalquota = adminquota + [MainFramMenuId.SYSTEM_AUDIT,MainFramMenuId.QUOTA_ADD]
 nothingquota = normalquota + [MainFramMenuId.QUOTA_MANAGE,MainFramMenuId.EVALUATE_COMPUTE,MainFramMenuId.EVALUATE_GETDATA,
-                              MainFramMenuId.GRAYRE_SEPARATE,MainFramMenuId.GRAYRE_TOTAL]
+                              MainFramMenuId.GRAYRE_SEPARATE,MainFramMenuId.GRAYRE_TOTAL,MainFramMenuId.EvALUATE_AGGREGATION,
+                              MainFramMenuId.WARD_AGGREGATION]
 
 menudisable = {UserDB.PERMISSION_NOTHING:nothingquota,UserDB.PERMISSION_NORMAL:normalquota,UserDB.PERMISSION_ADMIN:adminquota,UserDB.PERMISSION_ROOT:rootquota}
 
