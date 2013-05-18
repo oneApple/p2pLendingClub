@@ -7,6 +7,15 @@ class CFGrayRelationWeight:
         self.__futlist = futurelist
         self.__wlist = wlist
         
+    def getSortList(self,grwlist):
+        indexlist = []
+        import copy
+        sortlist = copy.deepcopy(grwlist)
+        sortlist.sort()
+        for _element in grwlist:
+            indexlist.append(sortlist.index(_element) + 1)
+        return indexlist    
+        
     def getWeightList(self,rMatrix,wlist,indexlist):
         sum = 0.0
         _weightlist = []
@@ -29,7 +38,10 @@ class CFGrayRelationWeight:
     
     def ComputeResult(self):
         templist = []
-        templist.append(self.computeSingle(*self.getWeightList(self.__rmatrix,self.__wlist, self.__curlist)))
-        templist.append(self.computeSingle(*self.getWeightList(self.__rmatrix,self.__wlist, self.__futlist)))
+        for _list in [self.__curlist,self.__futlist]:
+            wlist = self.computeSingle(*self.getWeightList(self.__rmatrix,self.__wlist, _list))
+            templist.append(wlist)
+            templist.append(self.getSortList(wlist))
+        
         return templist
     

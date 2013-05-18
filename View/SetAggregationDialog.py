@@ -1,22 +1,27 @@
 # -*- coding: UTF-8 -*-
 
 import wx
+from GlobalData import MagicNum
 
 CHECKBOXCOLNUM = 4
    
 class SetAggregationDialog(wx.Dialog):
-    def __init__(self,title,customerlist):
+    def __init__(self,title,customerlist,flag):
         self.__customerlist = customerlist
         self.__checkFlagMap = {}
         self.__checkIndexMap = {}
+        self.__flag = flag
         
         wx.Dialog.__init__(self, None, -1, title)
         self.__topSizer = wx.BoxSizer(wx.VERTICAL)
         
-        self.createStatic("输入层次数")
-        self.createSpinCtrl() 
-        self.createStatic("选择聚类个体") 
-        self.createCheckBox() 
+        
+        if self.__flag == MagicNum.SetAggregationDialog.AGGREGAT_SETLEVEL:
+            self.createStatic("\n输 入 层 次 数\n")
+            self.createSpinCtrl()
+        elif self.__flag == MagicNum.SetAggregationDialog.AGGREGAT_CHOSEELM:
+            self.createStatic("\n选择聚类个体\n") 
+            self.createCheckBox() 
         self.createButton("提交")
         
         self.SetSizer(self.__topSizer)
@@ -30,7 +35,7 @@ class SetAggregationDialog(wx.Dialog):
     
     def createStatic(self,label):
         _text = wx.StaticText(self,-1,label)
-        self.__topSizer.Add(_text,0,wx.EXPAND)
+        self.__topSizer.Add(_text,0,wx.ALIGN_CENTER)
         self.__topSizer.Add(wx.StaticLine(self), 0, wx.EXPAND|wx.ALL, 5)
     
     def createSpinCtrl(self):
@@ -63,11 +68,13 @@ class SetAggregationDialog(wx.Dialog):
         self.__checkFlagMap[event.GetEventObject()] = not self.__checkFlagMap[event.GetEventObject()]
         
     def buttonCmd(self,event):
-        self.level = self.__sc.GetValue()
-        self.indexList = []
-        for _ct in self.__checkFlagMap:
-            if self.__checkFlagMap[_ct]:
-                self.indexList.append(self.__checkIndexMap[_ct])
+        if self.__flag == MagicNum.SetAggregationDialog.AGGREGAT_SETLEVEL:
+            self.level = self.__sc.GetValue()
+        elif self.__flag == MagicNum.SetAggregationDialog.AGGREGAT_CHOSEELM:
+            self.indexList = []
+            for _ct in self.__checkFlagMap:
+                if self.__checkFlagMap[_ct]:
+                    self.indexList.append(self.__checkIndexMap[_ct])
         self.Destroy()
     
     def Run(self):

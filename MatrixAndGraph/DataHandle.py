@@ -23,7 +23,7 @@ class DataHandle:
         del self.__originData[len(self.__originData) - 1]
         return self.__rowlabel
     
-    def ComputeResult(self,typelist,curlist,futlist,level,userlist):
+    def ComputeGrayRelationResult(self,typelist,curlist,futlist):
         s = StandardProcess.StandardProcess(self.__originData,typelist)
         self.__standardData = s.ComputeResult()
         
@@ -38,24 +38,35 @@ class DataHandle:
         self.__grayRelationWeightData = g.ComputeResult()
         c = CFGrayRelationWeight.CFGrayRelationWeight(self.__GrayRelationData,self.__quotaData[3],curlist,futlist)
         self.__grayRelationWeightData += c.ComputeResult()
+        self.formMap()
         
-        
+    def ComputeLinkResult(self,userlist):    
         _classfiydata = []
-        _computedata = []
-        _userlabe = []
+        self.__computedata = []
+        self.__userlabe = []
+        
+        _grayRelationDelSortNum = []
+        for _index in range(len(self.__grayRelationWeightData) / 2):
+            _grayRelationDelSortNum.append(self.__grayRelationWeightData[_index * 2])
         
         import numpy as np
         for _index in userlist:
             _classfiydata.append(np.swapaxes(self.__GrayRelationData,0,1)[_index])
-            _computedata.append(np.swapaxes(self.__grayRelationWeightData,0,1)[_index])
-            _userlabe.append(self.__rowlabel[_index])
+            self.__computedata.append(np.swapaxes(_grayRelationDelSortNum,0,1)[_index])
+            self.__userlabe.append(self.__rowlabel[_index])
         
-        c = Classify.Classify(np.swapaxes(_classfiydata,0,1),level)
-        _result = c.ComputeResult(_userlabe,np.swapaxes(_computedata,0,1))
-        self.__aggregationData = _result[0]
-        self.__linkresult = _result[1]
+        self.__c = Classify.Classify(np.swapaxes(_classfiydata,0,1))  
+        linkres = self.__c.getLinkResult() 
+        from GlobalData.MagicNum import DataMap
+        self.__dataMap[DataMap.SIX_LINKRESULT] = linkres
+        return linkres
         
-        self.formMap()
+    def ComputeAggregationResult(self,level,userlist):
+        import numpy as np
+        aggres = self.__c.ComputeResult(self.__userlabe,np.swapaxes(self.__computedata,0,1),level)
+        from GlobalData.MagicNum import DataMap
+        self.__dataMap[DataMap.SEVEN_AGGREGATION] = aggres
+        return aggres
         
     def formMap(self):
         from GlobalData.MagicNum import DataMap
@@ -64,9 +75,7 @@ class DataHandle:
                           DataMap.TWO_STANDARD:self.__standardData,
                           DataMap.THREE_GRCOEFFICIENT:self.__GrayRelationData,
                           DataMap.FOUR_QUOTAWEIGHT:self.__quotaData,
-                          DataMap.FIVE_GRWEIGHT:self.__grayRelationWeightData,
-                          DataMap.SIX_LINKRESULT:self.__linkresult,
-                          DataMap.SEVEN_AGGREGATION:self.__aggregationData}
+                          DataMap.FIVE_GRWEIGHT:self.__grayRelationWeightData}
     
     def GetData(self,type):
         return self.__dataMap[type]
