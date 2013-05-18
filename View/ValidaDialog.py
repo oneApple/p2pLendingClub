@@ -60,7 +60,7 @@ class ValidaDialog(wx.Dialog):
         self.sizer.Add(wx.StaticLine(self), 0, wx.EXPAND|wx.ALL, 5)
     
     def createHeaderButton(self):
-        jpg = wx.Image("./ico/logo.gif",wx.BITMAP_TYPE_GIF).ConvertToBitmap()
+        jpg = wx.Image("./ico/logo.jpg",wx.BITMAP_TYPE_JPEG).ConvertToBitmap()
         fileButton=wx.BitmapButton(self,-1,jpg)
         self.Bind(wx.EVT_BUTTON,self.registerButtonFun,fileButton)
         self.sizer.Add(fileButton, 0, wx.EXPAND, 5)

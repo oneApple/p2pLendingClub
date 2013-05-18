@@ -5,8 +5,9 @@ class MatrixTable(wx.grid.PyGridTableBase):
         wx.grid.PyGridTableBase.__init__(self)
         self.__data = matrix
         self.__rowLabels = rowlabel
-        self.__colLabels = collabel        
-         
+        self.__colLabels = collabel
+        
+    
     def GetNumberRows(self):
         return len(self.__data)
  
@@ -17,7 +18,11 @@ class MatrixTable(wx.grid.PyGridTableBase):
         return False
  
     def GetValue(self, row, col):
-        return self.__data[row][col]
+        import numpy
+        if type(self.__data[row][col]) == numpy.float64:
+            return "%5.3f" % self.__data[row][col]
+        else:
+            return self.__data[row][col]
  
     def SetValue(self, row, col, value):
         pass

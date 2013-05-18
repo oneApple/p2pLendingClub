@@ -17,7 +17,7 @@ class LoginDialog(ValidaDialog.ValidaDialog,object):
     
     def getHeaderText(self):
         _text = """\
-        欢 迎 登 录 系 统\
+        在线客户群价值评价系统\
         """
         return _text
     
@@ -38,7 +38,7 @@ class LoginDialog(ValidaDialog.ValidaDialog,object):
             self.tryAgain("密码错误")
         else:
             self.Destroy()
-            MainFrame.MainFrame("综合评价",_res[0][0],_res[0][3])
+            MainFrame.MainFrame("在线客户群价值评价系统",_res[0][0],_res[0][3])
         _db.CloseCon()
     
     def registerButtonFun(self,event):

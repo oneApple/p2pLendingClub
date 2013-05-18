@@ -6,7 +6,7 @@ from DataBase import QuotaTable ,CommentTable
 import SearchQuotaDialog
    
 class SelectQuotaDialog(wx.Dialog):
-    def __init__(self,title,username):
+    def __init__(self,title,username,flag):
         
         self.__username = username
         wx.Dialog.__init__(self, None, -1, title)
@@ -15,9 +15,13 @@ class SelectQuotaDialog(wx.Dialog):
         
         self.createStatic()
         self.createComboBox()
-        self.createDeleAndSearButton()
-        self.createCommentText()
-        self.createCommentButton()
+        
+        from GlobalData import MagicNum
+        if flag == MagicNum.SelectQuotaDialog.DELETEANDALTER:
+            self.createDeleAndSearButton()
+        elif flag == MagicNum.SelectQuotaDialog.ADDCOMMENT:
+            self.createCommentText()
+            self.createCommentButton()
         
         self.SetSizer(self.__topSizer)
         self.__topSizer.Fit(self)

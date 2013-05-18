@@ -12,8 +12,9 @@ import MatrixTable
 import numpy as np
 import wx.grid
 
-usermenu = {MainFramMenuId.USER_ALTERPOS:"修改信息",MainFramMenuId.USER_ALTERPSW:"修改密码",MainFramMenuId.USER_LOGOUT:"注销登录"}
-quotamenu = {MainFramMenuId.QUOTA_MANAGE:"管理",MainFramMenuId.QUOTA_ADD:"增加",MainFramMenuId.QUOTA_SEARCH:"查看"}
+usermenu = {MainFramMenuId.USER_ALTERMES:"信息管理",MainFramMenuId.USER_ALTERPSW:"修改密码",MainFramMenuId.USER_LOGOUT:"注销登录"}
+quotamenu = {MainFramMenuId.QUOTA_SEARCH:"指标查询",MainFramMenuId.QUOTA_ADD:"指标增加",MainFramMenuId.QUOTA_ALTER:"修改删除",
+             MainFramMenuId.QUOTA_COMMENT:"指标评论",MainFramMenuId.COMMENT_SEARCH:"查看评论"}
 evaluatemenu = {MainFramMenuId.EVALUATE_GETDATA:"数据输入",MainFramMenuId.EvALUATE_AGGREGATION:"聚类设置",MainFramMenuId.EVALUATE_COMPUTE:"数据处理"}
 graphmenu = {MainFramMenuId.GRAYRE_TOTAL:"客户群价值",MainFramMenuId.GRAYRE_SEPARATE:"当前和未来",MainFramMenuId.WARD_AGGREGATION:"聚类图"}
 systemmenu = {MainFramMenuId.SYSTEM_AUDIT:"用户审核",MainFramMenuId.SYSTEM_PERMISSION:"权限管理",MainFramMenuId.SYSTEM_HELP:"使用帮助"}
@@ -24,7 +25,7 @@ menuchild = (usermenu,quotamenu,evaluatemenu,graphmenu,systemmenu)
 rootquota = []
 adminquota = [MainFramMenuId.SYSTEM_PERMISSION]
 normalquota = adminquota + [MainFramMenuId.SYSTEM_AUDIT,MainFramMenuId.QUOTA_ADD]
-nothingquota = normalquota + [MainFramMenuId.QUOTA_MANAGE,MainFramMenuId.EVALUATE_COMPUTE,MainFramMenuId.EVALUATE_GETDATA,
+nothingquota = normalquota + [MainFramMenuId.QUOTA_ALTER,MainFramMenuId.EVALUATE_COMPUTE,MainFramMenuId.EVALUATE_GETDATA,
                               MainFramMenuId.GRAYRE_SEPARATE,MainFramMenuId.GRAYRE_TOTAL,MainFramMenuId.EvALUATE_AGGREGATION,
                               MainFramMenuId.WARD_AGGREGATION]
 
@@ -143,21 +144,26 @@ class MainFrame(wx.Frame):
             wx.MenuBar.Enable(self.__menuBar,menu,False)
     
     def setMenuEvent(self):
-        wx.EVT_MENU(self,MainFramMenuId.USER_ALTERPOS,self.menuAlterUserPosCmd);
+        wx.EVT_MENU(self,MainFramMenuId.USER_ALTERMES,self.menuAlterUserPosCmd);
         wx.EVT_MENU(self,MainFramMenuId.USER_ALTERPSW,self.menuAlterUserPswCmd);
         wx.EVT_MENU(self,MainFramMenuId.USER_LOGOUT,self.menuLogoutCmd);
+        
         wx.EVT_MENU(self,MainFramMenuId.SYSTEM_PERMISSION,self.menuAlterUserPerCmd)
         wx.EVT_MENU(self,MainFramMenuId.SYSTEM_AUDIT,self.menuAllowUserPerCmd)
         wx.EVT_MENU(self,MainFramMenuId.SYSTEM_HELP,self.menuHelpCmd)
+        
         wx.EVT_MENU(self,MainFramMenuId.QUOTA_ADD,self.menuAddQuotaCmd)
-        wx.EVT_MENU(self,MainFramMenuId.QUOTA_MANAGE,self.menuManageQuotaCmd)
-        wx.EVT_MENU(self,MainFramMenuId.QUOTA_SEARCH,self.menuSearchQuotaCmd)
+        wx.EVT_MENU(self,MainFramMenuId.QUOTA_ALTER,self.menuManageQuotaCmd)
+        wx.EVT_MENU(self,MainFramMenuId.QUOTA_COMMENT,self.menuAddCommentCmd)
+        wx.EVT_MENU(self,MainFramMenuId.COMMENT_SEARCH,self.menuSearchCommentCmd)
+        
         wx.EVT_MENU(self,MainFramMenuId.EVALUATE_GETDATA,self.menuGetDataCmd)
+        wx.EVT_MENU(self,MainFramMenuId.EvALUATE_AGGREGATION,self.menuSetAggregationCmd)
         wx.EVT_MENU(self,MainFramMenuId.EVALUATE_COMPUTE,self.menuComputeCmd)
+        
         wx.EVT_MENU(self,MainFramMenuId.GRAYRE_SEPARATE,self.menuSeparateGrapyCmd)
         wx.EVT_MENU(self,MainFramMenuId.GRAYRE_TOTAL,self.menuTotalGrapyCmd)
         wx.EVT_MENU(self,MainFramMenuId.WARD_AGGREGATION,self.menuWardGarphCmd)
-        wx.EVT_MENU(self,MainFramMenuId.EvALUATE_AGGREGATION,self.menuSetAggregationCmd)
 
     def menuSetAggregationCmd(self,event):
         try:
@@ -194,7 +200,7 @@ class MainFrame(wx.Frame):
         _dlg = AddQuotaDialog.AddQuotaDialog()
         _dlg.Run()
     
-    def menuSearchQuotaCmd(self,event):
+    def menuSearchCommentCmd(self,event):
         from DataBase import CommentTable
         try:
             _db = CommentTable.CommentTable()
@@ -215,7 +221,11 @@ class MainFrame(wx.Frame):
             wx.MessageBox("数据获取错误","错误",wx.ICON_ERROR|wx.YES_DEFAULT)
 
     def menuManageQuotaCmd(self,event):
-        _dlg = SelectQuotaDialog.SelectQuotaDialog("指标管理",self.__username)
+        _dlg = SelectQuotaDialog.SelectQuotaDialog("指标管理",self.__username,MagicNum.SelectQuotaDialog.DELETEANDALTER)
+        _dlg.Run()
+    
+    def menuAddCommentCmd(self,event):
+        _dlg = SelectQuotaDialog.SelectQuotaDialog("指标评论",self.__username,MagicNum.SelectQuotaDialog.ADDCOMMENT)
         _dlg.Run()
     
     def menuGetDataCmd(self,event):
@@ -284,6 +294,6 @@ class MainFrame(wx.Frame):
         self.Destroy() 
 if __name__=='__main__': 
     app = wx.App()
-    f = MainFrame("综合评价","keyaming",2003)
+    f = MainFrame("在线客户群价值评价系统","keyaming",2003)
     app.MainLoop()
     
