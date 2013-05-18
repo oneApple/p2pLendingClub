@@ -236,13 +236,13 @@ class MainFrame(wx.Frame):
             templist = []
             templist.append(list[0])
             if list[1] - MagicNum.QuotaTable.CURRENT_VALUE:
-                templist.append("未来指标".encode("utf-8"))
+                templist.append("未来指标".decode('utf8'))
             else:
-                templist.append("当前指标".encode("utf-8"))
+                templist.append("当前价值".decode('utf8'))
             if list[2] - MagicNum.QuotaTable.NEGATIVE_RELATION:
-                templist.append("正相关".encode("utf-8"))
+                templist.append("正相关".decode('utf8'))
             else:
-                templist.append("负相关".encode("utf-8"))
+                templist.append("负相关".decode('utf8'))
             templist.append(list[3])
             templist.append(list[4])
             return templist

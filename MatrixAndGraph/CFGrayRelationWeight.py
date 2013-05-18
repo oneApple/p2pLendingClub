@@ -11,7 +11,7 @@ class CFGrayRelationWeight:
         indexlist = []
         import copy
         sortlist = copy.deepcopy(grwlist)
-        sortlist.sort()
+        sortlist.sort(reverse = True)
         for _element in grwlist:
             indexlist.append(sortlist.index(_element) + 1)
         return indexlist    

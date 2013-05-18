@@ -64,7 +64,7 @@ class SelectQuotaDialog(wx.Dialog):
     def createCommentText(self):
         self.__commentText = wx.TextCtrl(self, -1,
                   "您可以在这里写下对该指标的评论\n"
-                  "在下面选择该指标的分数",
+                  "在下面选择该指标的分数,分数越高表示改指标越重要",
                   size=(250, 100), style=wx.TE_MULTILINE) #创建一个文本控件
         self.__commentText.SetInsertionPoint(0) #设置插入点
 

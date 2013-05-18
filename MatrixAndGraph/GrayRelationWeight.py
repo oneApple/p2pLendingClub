@@ -9,7 +9,7 @@ class GrayRelationWeight:
         indexlist = []
         import copy
         sortlist = copy.deepcopy(self.__grwlist)
-        sortlist.sort()
+        sortlist.sort(reverse = True)
         for _element in self.__grwlist:
             indexlist.append(sortlist.index(_element) + 1)
         return indexlist
