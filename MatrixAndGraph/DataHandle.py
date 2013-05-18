@@ -59,9 +59,9 @@ class DataHandle:
         linkres = self.__c.getLinkResult() 
         from GlobalData.MagicNum import DataMap
         self.__dataMap[DataMap.SIX_LINKRESULT] = linkres
-        return linkres
+        return self.__userlabe
         
-    def ComputeAggregationResult(self,level,userlist):
+    def ComputeAggregationResult(self,level):
         import numpy as np
         aggres = self.__c.ComputeResult(self.__userlabe,np.swapaxes(self.__computedata,0,1),level)
         from GlobalData.MagicNum import DataMap

@@ -15,14 +15,14 @@ import wx.grid
 usermenu = {MainFramMenuId.USER_ALTERMES:"信息管理",MainFramMenuId.USER_ALTERPSW:"修改密码",MainFramMenuId.USER_LOGOUT:"注销登录"}
 quotamenu = {MainFramMenuId.QUOTA_SEARCH:"指标查询",MainFramMenuId.QUOTA_ADD:"指标增加",MainFramMenuId.QUOTA_ALTER:"修改删除",
              MainFramMenuId.QUOTA_COMMENT:"指标评论",MainFramMenuId.COMMENT_SEARCH:"查看评论"}
-evaluatemenu = {MainFramMenuId.EVALUATE_GETDATA:"数据输入",MainFramMenuId.EVALUATE_COMPUTE:"数据处理"}
-graphmenu = {MainFramMenuId.GRAYRE_TOTAL:"客户群价值",MainFramMenuId.GRAYRE_SEPARATE:"当前和未来"}
+evaluatemenu = {MainFramMenuId.EVALUATE_GETDATA:"数据输入",MainFramMenuId.EVALUATE_COMPUTE:"数据处理",
+                MainFramMenuId.GRAYRE_TOTAL:"客户群价值",MainFramMenuId.GRAYRE_SEPARATE:"当前和未来"}
 aggregatmenu = {MainFramMenuId.AGGREGAT_CHOSEELM:"个体选择",MainFramMenuId.AGGREGAT_AGGGRAPH:"聚类分析",
                 MainFramMenuId.AGGREGAT_CHOSELEV:"层次选择",MainFramMenuId.AGGREGAT_CLASSIFY:"类别分析"}
 systemmenu = {MainFramMenuId.SYSTEM_AUDIT:"用户审核",MainFramMenuId.SYSTEM_PERMISSION:"权限管理",MainFramMenuId.SYSTEM_HELP:"使用帮助"}
 
-menulabel = ("用户管理","指标管理","灰色关联分析","灰色关联图表","聚类分析","系统管理")
-menuchild = (usermenu,quotamenu,evaluatemenu,graphmenu,aggregatmenu,systemmenu)
+menulabel = ("用户管理","指标管理","灰色关联分析","聚类分析","系统管理")
+menuchild = (usermenu,quotamenu,evaluatemenu,aggregatmenu,systemmenu)
 
 rootquota = []
 adminquota = [MainFramMenuId.SYSTEM_PERMISSION]
@@ -168,9 +168,9 @@ class MainFrame(wx.Frame):
     
     def menuAggregationCmd(self,event):
         try:
-            self.__data.ComputeAggregationResult(self.__level, self.__indexlist)
+            self.__data.ComputeAggregationResult(self.__level)
             _collabel = ["客户群价值","当前价值","未来价值","客户群组成"]
-            self.changeGrid(DataMap.SEVEN_AGGREGATION,False,[x for x in range(3)],_collabel)
+            self.changeGrid(DataMap.SEVEN_AGGREGATION,False,[x for x in range(self.__level)],_collabel)
         except:
             wx.MessageBox("数据获取错误","错误",wx.ICON_ERROR|wx.YES_DEFAULT)
     
@@ -232,6 +232,21 @@ class MainFrame(wx.Frame):
             wx.MessageBox("数据获取错误","错误",wx.ICON_ERROR|wx.YES_DEFAULT)
     
     def menuSearchQuotaCmd(self,event):
+        def transindex2label(list):
+            templist = []
+            templist.append(list[0])
+            if list[1] - MagicNum.QuotaTable.CURRENT_VALUE:
+                templist.append("未来指标")
+            else:
+                templist.append("当前指标")
+            if list[2] - MagicNum.QuotaTable.NEGATIVE_RELATION:
+                templist.append("正相关")
+            else:
+                templist.append("负相关")
+            templist.append(list[3])
+            templist.append(list[4])
+            return templist
+        
         from DataBase import QuotaTable
         try:
             _db = QuotaTable.QuotaTable()
@@ -242,7 +257,12 @@ class MainFrame(wx.Frame):
             rowlabel = []
             for index in range(len(_res)):
                 rowlabel.append(index)
-            _matrix = np.array(_res)
+            
+            tempmatrix = []
+            for _list in _res:    
+                tempmatrix.append(transindex2label(_list))
+            _matrix = np.array(tempmatrix)
+            
             _m = MatrixTable.MatrixTable(_matrix,collabel,rowlabel)
             self.__grid.ClearGrid()#清空表格
             self.__grid.SetTable(_m)
@@ -314,7 +334,7 @@ class MainFrame(wx.Frame):
             ylist = np.arange(0,1,0.1)
             p = PolyGraph.PolyGraph(self.__data.GetData(DataMap.ZERO_ROWLABEL),ylist,self.__data.GetData(DataMap.FIVE_GRWEIGHT))
             #以下四个值分别为标题，ｙ轴标题，ｘ轴标题，折线标签
-            p.Draw("Clients Value Gray Relation", "Client", "Gray Relation",["client value"])
+            p.Draw("Customer Group Value Gray Relation", "Customer", "Gray Relation",["customer value"])
         except (AttributeError,UnboundLocalError),e:
             wx.MessageBox("数据获取错误","错误",wx.ICON_ERROR|wx.YES_DEFAULT)
 
@@ -322,19 +342,20 @@ class MainFrame(wx.Frame):
         "此处是当前未来价值图"
         try:
             ylist = np.arange(0,1,0.1)
-            p = PolyGraph.PolyGraph(self.__data.GetData(DataMap.ZERO_ROWLABEL),ylist,self.__data.GetData(DataMap.FIVE_GRWEIGHT)[1:])
+            p = PolyGraph.PolyGraph(self.__data.GetData(DataMap.ZERO_ROWLABEL),ylist,[self.__data.GetData(DataMap.FIVE_GRWEIGHT)[2],self.__data.GetData(DataMap.FIVE_GRWEIGHT)[4]])
             #以下四个值分别为标题，ｙ轴标题，ｘ轴标题，折线标签
-            p.Draw("Clients Value Gray Relation", "Client", "Gray Relation",["current","future"])
+            p.Draw("Customer Group Value Gray Relation", "Customer", "Gray Relation",["current","future"])
         except (AttributeError,UnboundLocalError),e:
             wx.MessageBox("数据获取错误","错误",wx.ICON_ERROR|wx.YES_DEFAULT)
             
     def menuWardGarphCmd(self,event):
         "此处是聚类图"
-        self.__data.ComputeLinkResult(self.__indexlist)
+        xlabel = self.__data.ComputeLinkResult(self.__indexlist)
         a = Aggregation.Aggregation(self.__data.GetData(MagicNum.DataMap.SIX_LINKRESULT),
-                                    self.__data.GetData(MagicNum.DataMap.ZERO_ROWLABEL))
+                                    xlabel)
+                                    #self.__data.GetData(MagicNum.DataMap.ZERO_ROWLABEL))
         #三个值分别为标题，ｙ轴标题，ｘ轴标题
-        a.Draw("Ward Aggregation", "Value", "Customer")
+        a.Draw("Ward Aggregation", "Customer", "Value")
         
 if __name__=='__main__': 
     app = wx.App()

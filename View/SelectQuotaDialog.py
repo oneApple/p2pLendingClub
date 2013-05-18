@@ -43,6 +43,7 @@ class SelectQuotaDialog(wx.Dialog):
         for quota in self.__res:
             _quotaList.append(quota[0])
         self.__combo = wx.ComboBox(self, -1, _quotaList[0], choices = _quotaList, size = (300,30),style = wx.CB_DROPDOWN)
+        self.__combo.SetSelection(0)
         self.__topSizer.Add(self.__combo, 0, wx.ALIGN_CENTER, 5)
         self.__topSizer.Add(wx.StaticLine(self), 0, wx.EXPAND|wx.ALL, 5)
     

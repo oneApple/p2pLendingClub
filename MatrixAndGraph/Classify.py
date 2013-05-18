@@ -11,6 +11,7 @@ class Classify:
         distance = spatial.distance.pdist(self.__rmatrix)
         _ma = spatial.distance.squareform(distance)
         self.__linkresult = linkage(_ma,method="ward",metric = "euclidean")
+        print self.__linkresult
         for _pair in self.__linkresult:
             self.__classPair.append(_pair[:2])
         

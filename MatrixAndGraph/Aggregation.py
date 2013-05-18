@@ -9,6 +9,7 @@ class Aggregation:
     def Draw(self,title,xlabel,ylabel):
         pylab.figure(figsize= (15,10))
         res = dendrogram(self.__link)
+
         _max = len(res['ivl']) * 10 + 5
         pylab.xlabel(xlabel)
         pylab.ylabel(ylabel)
