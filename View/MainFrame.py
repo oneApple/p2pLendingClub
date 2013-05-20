@@ -176,7 +176,7 @@ class MainFrame(wx.Frame):
     
     def menuRebuildDbCmd(self,event):
         from DataBase import CommentTable, QuotaTable, UserTable
-        _dblist = [CommentTable.CommentTable(),QuotaTable.QuotaTable(),UserTable.UserTable()]
+        _dblist = [CommentTable.CommentTable()]#,QuotaTable.QuotaTable(),UserTable.UserTable()]
         for _db in _dblist:
             self.rebuildDb(_db)
     
