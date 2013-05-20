@@ -19,7 +19,8 @@ evaluatemenu = {MainFramMenuId.EVALUATE_GETDATA:"数据输入",MainFramMenuId.EV
                 MainFramMenuId.GRAYRE_TOTAL:"客户群价值",MainFramMenuId.GRAYRE_SEPARATE:"当前和未来"}
 aggregatmenu = {MainFramMenuId.AGGREGAT_CHOSEELM:"个体选择",MainFramMenuId.AGGREGAT_AGGGRAPH:"聚类分析",
                 MainFramMenuId.AGGREGAT_CHOSELEV:"层次选择",MainFramMenuId.AGGREGAT_CLASSIFY:"类别分析"}
-systemmenu = {MainFramMenuId.SYSTEM_AUDIT:"用户审核",MainFramMenuId.SYSTEM_PERMISSION:"权限管理",MainFramMenuId.SYSTEM_HELP:"使用帮助"}
+systemmenu = {MainFramMenuId.SYSTEM_AUDIT:"用户审核",MainFramMenuId.SYSTEM_PERMISSION:"权限管理",
+              MainFramMenuId.SYSTEM_HELP:"使用帮助",MainFramMenuId.SYSTEM_REBUILDDB:"清空数据"}
 
 menulabel = ("用户管理","指标管理","灰色关联分析","聚类分析","系统管理")
 menuchild = (usermenu,quotamenu,evaluatemenu,aggregatmenu,systemmenu)
@@ -148,6 +149,7 @@ class MainFrame(wx.Frame):
         wx.EVT_MENU(self,MainFramMenuId.SYSTEM_PERMISSION,self.menuAlterUserPerCmd)
         wx.EVT_MENU(self,MainFramMenuId.SYSTEM_AUDIT,self.menuAllowUserPerCmd)
         wx.EVT_MENU(self,MainFramMenuId.SYSTEM_HELP,self.menuHelpCmd)
+        wx.EVT_MENU(self,MainFramMenuId.SYSTEM_REBUILDDB,self.menuRebuildDbCmd)
         
         wx.EVT_MENU(self,MainFramMenuId.QUOTA_ADD,self.menuAddQuotaCmd)
         wx.EVT_MENU(self,MainFramMenuId.QUOTA_ALTER,self.menuManageQuotaCmd)
@@ -165,6 +167,18 @@ class MainFrame(wx.Frame):
         
         wx.EVT_MENU(self,MainFramMenuId.GRAYRE_SEPARATE,self.menuSeparateGrapyCmd)
         wx.EVT_MENU(self,MainFramMenuId.GRAYRE_TOTAL,self.menuTotalGrapyCmd)
+    
+    def rebuildDb(self,db):
+        db.Connect()
+        db.DeleteTable()
+        db.CreateTable()
+        db.CloseCon()
+    
+    def menuRebuildDbCmd(self,event):
+        from DataBase import CommentTable, QuotaTable, UserTable
+        _dblist = [CommentTable.CommentTable(),QuotaTable.QuotaTable(),UserTable.UserTable()]
+        for _db in _dblist:
+            self.rebuildDb(_db)
     
     def menuAggregationCmd(self,event):
         try:

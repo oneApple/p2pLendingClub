@@ -12,7 +12,10 @@ class MatrixTable(wx.grid.PyGridTableBase):
         return len(self.__data)
  
     def GetNumberCols(self):
-        return len(self.__data[0])
+        try:
+            return len(self.__data[0])
+        except:
+            pass
  
     def IsEmptyCell(self, row, col):
         return False

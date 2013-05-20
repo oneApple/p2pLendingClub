@@ -31,6 +31,9 @@ class UserTable(DbInterface.DbInterface,object):
     def DeleteUser(self,name):
         _sql = "DELETE FROM UserDB WHERE name=?"
         self.ExcuteCmd(_sql, [name,])    
+    
+    def DeleteTable(self):
+        self.ExcuteCmd("DROP TABLE UserDB")   
         
 if __name__=='__main__': 
     a = UserTable()
